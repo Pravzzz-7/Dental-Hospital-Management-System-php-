@@ -1,80 +1,168 @@
+<?php
+    session_start();
+    include('assets/inc/config.php');//get configuration file
+    if(isset($_POST['doc_login']))
+    {
+        $doc_number = $_POST['doc_number'];
+        //$doc_email = $_POST['doc_ea']
+        $doc_pwd = sha1(md5($_POST['doc_pwd']));//double encrypt to increase security
+        $stmt=$mysqli->prepare("SELECT doc_number, doc_pwd, doc_id FROM his_docs WHERE  doc_number=? AND doc_pwd=? ");//sql to log in user
+        $stmt->bind_param('ss', $doc_number, $doc_pwd);//bind fetched parameters
+        $stmt->execute();//execute bind
+        $stmt -> bind_result($doc_number, $doc_pwd ,$doc_id);//bind result
+        $rs=$stmt->fetch();
+        $_SESSION['doc_id'] = $doc_id;
+        $_SESSION['doc_number'] = $doc_number;//Assign session to doc_number id
+        //$uip=$_SERVER['REMOTE_ADDR'];
+        //$ldate=date('d/m/Y h:i:s', time());
+        if($rs)
+            {//if its sucessfull
+                header("location:his_doc_dashboard.php");
+            }
+
+        else
+            {
+            #echo "<script>alert('Access Denied Please Check Your Credentials');</script>";
+                $err = "Access Denied Please Check Your Credentials";
+            }
+    }
+?>
+<!--End Login-->
 <!DOCTYPE html>
 <html lang="en">
+    
 <head>
-    <!-- Required Meta Tags -->
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <meta charset="utf-8" />
+        <title>Hospital Management System -A Super Responsive Information System</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta content="" name="description" />
+        <meta content="" name="MartDevelopers" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <!-- App favicon -->
+        <link rel="shortcut icon" href="assets/images/favicon.ico">
 
-    <!-- Page Title -->
-    <title>Hospital Management System</title>
+        <!-- App css -->
+        <link href="assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+        <link href="assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+        <link href="assets/css/app.min.css" rel="stylesheet" type="text/css" />
+        <!--Load Sweet Alert Javascript-->
+        
+        <script src="assets/js/swal.js"></script>
+        <!--Inject SWAL-->
+        <?php if(isset($success)) {?>
+        <!--This code for injecting an alert-->
+                <script>
+                            setTimeout(function () 
+                            { 
+                                swal("Success","<?php echo $success;?>","success");
+                            },
+                                100);
+                </script>
 
-    <!-- Favicon -->
-    <link rel="shortcut icon" href="assets/images/logo/favicon.png" type="image/x-icon">
+        <?php } ?>
 
-    <!-- CSS Files -->
-    <link rel="stylesheet" href="assets/css/animate-3.7.0.css">
-    <link rel="stylesheet" href="assets/css/font-awesome-4.7.0.min.css">
-    <link rel="stylesheet" href="assets/css/bootstrap-4.1.3.min.css">
-    <link rel="stylesheet" href="assets/css/owl-carousel.min.css">
-    <link rel="stylesheet" href="assets/css/jquery.datetimepicker.min.css">
-    <link rel="stylesheet" href="assets/css/linearicons.css">
-    <link rel="stylesheet" href="assets/css/style.css">
-</head>
-<body>
-    <!-- Preloader Starts -->
-    <div class="preloader">
-        <div class="spinner"></div>
-    </div>
-    <!-- Preloader End -->
+        <?php if(isset($err)) {?>
+        <!--This code for injecting an alert-->
+                <script>
+                            setTimeout(function () 
+                            { 
+                                swal("Failed","<?php echo $err;?>","error");
+                            },
+                                100);
+                </script>
 
-    <!-- Header Area Starts -->
-    <header class="header-area">
-        <div id="header" id="home">
+        <?php } ?>
+
+
+
+    </head>
+
+    <body class="authentication-bg authentication-bg-pattern">
+
+        <div class="account-pages mt-5 mb-5">
             <div class="container">
-                <div class="row align-items-center justify-content-between d-flex">
-                <div id="logo">
-                    <a href="index.php"></a>
+                <div class="row justify-content-center">
+                    <div class="col-md-8 col-lg-6 col-xl-5">
+                        <div class="card bg-pattern">
+
+                            <div class="card-body p-4">
+                                
+                                <div class="text-center w-75 m-auto">
+                                    <a href="index.php">
+                                        <span><img src="assets/images/logo-dark.png" alt="" height="22"></span>
+                                    </a>
+                                    <p class="text-muted mb-4 mt-3">Enter your email address and password to access Doctor panel.</p>
+                                </div>
+
+                                <form method='post' >
+
+                                    <div class="form-group mb-3">
+                                        <label for="emailaddress">Doctor Number</label>
+                                        <input class="form-control" name="doc_number" type="text" id="emailaddress" required="" placeholder="Enter your doctor number">
+                                    </div>
+
+                                    <div class="form-group mb-3">
+                                        <label for="password">Password</label>
+                                        <input class="form-control" name="doc_pwd" type="password" required="" id="password" placeholder="Enter your password">
+                                    </div>
+
+                                    <div class="form-group mb-0 text-center">
+                                        <button class="btn btn-success btn-block" name="doc_login" type="submit"> Log In </button>
+                                    </div>
+
+                                </form>
+
+                                <!--
+                                For Now Lets Disable This 
+                                This feature will be implemented on later versions
+                                <div class="text-center">
+                                    <h5 class="mt-3 text-muted">Sign in with</h5>
+                                    <ul class="social-list list-inline mt-3 mb-0">
+                                        <li class="list-inline-item">
+                                            <a href="javascript: void(0);" class="social-list-item border-primary text-primary"><i class="mdi mdi-facebook"></i></a>
+                                        </li>
+                                        <li class="list-inline-item">
+                                            <a href="javascript: void(0);" class="social-list-item border-danger text-danger"><i class="mdi mdi-google"></i></a>
+                                        </li>
+                                        <li class="list-inline-item">
+                                            <a href="javascript: void(0);" class="social-list-item border-info text-info"><i class="mdi mdi-twitter"></i></a>
+                                        </li>
+                                        <li class="list-inline-item">
+                                            <a href="javascript: void(0);" class="social-list-item border-secondary text-secondary"><i class="mdi mdi-github-circle"></i></a>
+                                        </li>
+                                    </ul>
+                                </div> 
+                                -->
+
+                            </div> <!-- end card-body -->
+                        </div>
+                        <!-- end card -->
+
+                        <div class="row mt-3">
+                            <div class="col-12 text-center">
+                                <p> <a href="his_doc_reset_pwd.php" class="text-white-50 ml-1">Forgot your password?</a></p>
+                               <!-- <p class="text-white-50">Don't have an account? <a href="his_admin_register.php" class="text-white ml-1"><b>Sign Up</b></a></p>-->
+                            </div> <!-- end col -->
+                        </div>
+                        <!-- end row -->
+
+                    </div> <!-- end col -->
                 </div>
-                <nav id="nav-menu-container">
-                    <ul class="nav-menu">
-                        <li class="menu-active"><a href="index.php">Home</a></li>
-                        <li><a href="backend/doc/index.php">Doctor's Login</a></li>
-                        <li><a href="backend/admin/index.php">Administrator Login</a></li>
-                    </ul>
-                </nav><!-- #nav-menu-container -->		    		
-                </div>
+                <!-- end row -->
             </div>
+            <!-- end container -->
         </div>
-    </header>
-    <!-- Header Area End -->
-
-    <!-- Banner Area Starts -->
-    <section class="banner-area">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-8">
-                    <h4>Caring for better life</h4>
-                    <h4>Mini Project Made By: G Ganesh S P </h4>
-                    <h1>Leading the way in medical excellence</h1>
-                    <p>HMS is awarded as one of the Top Hospital Management System, which can integrate all the HIS systems, processes and machines into an intelligent information system to derive operational efficiency and assist hospitals in decision making process through MIS and Analytics.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-   
+        <!-- end page -->
 
 
-    <!-- Javascript -->
-    <script src="assets/js/vendor/jquery-2.2.4.min.js"></script>
-	<script src="assets/js/vendor/bootstrap-4.1.3.min.js"></script>
-    <script src="assets/js/vendor/wow.min.js"></script>
-    <script src="assets/js/vendor/owl-carousel.min.js"></script>
-    <script src="assets/js/vendor/jquery.datetimepicker.full.min.js"></script>
-    <script src="assets/js/vendor/jquery.nice-select.min.js"></script>
-    <script src="assets/js/vendor/superfish.min.js"></script>
-    <script src="assets/js/main.js"></script>
+        <?php include ("assets/inc/footer1.php");?>
 
-</body>
+        <!-- Vendor js -->
+        <script src="assets/js/vendor.min.js"></script>
+
+        <!-- App js -->
+        <script src="assets/js/app.min.js"></script>
+        
+    </body>
+
 </html>
