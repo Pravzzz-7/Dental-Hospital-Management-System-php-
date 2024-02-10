@@ -28,3 +28,9 @@ n order to add a new patient, the user must enter a number of details. such as t
 - forgot password
 - Adding User and Admin.
 
+
+#### "Suggestions and project improvement ideas are welcomed!"
+
+#### "PROJECT BY: L PRAVEENA <3"
+
+<bold>Thanks a lot</bold><br/>
